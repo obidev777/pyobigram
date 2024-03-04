@@ -6,7 +6,7 @@ Pyobigram is a fast library for telegram bots , mtproto update, author : Obisoft
 ```
 pip install pyobigram
 ```
-# Features v2.1.0
+# Features v2.2.0
 - Suport Handle Messages (all_messages,cmd_message,inline_message,callback_message)
 - Suport Send & Edit & Delete (Messages)
 - Suport Forward Messages
