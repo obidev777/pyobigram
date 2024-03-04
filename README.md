@@ -13,11 +13,12 @@ pip install pyobigram
 - Suport Upload & Download Files MtProto (max 2gb)
 - Suport AnswerInline (InlineArticle,InlineDocument)
 - Suport Send Reply Narkup Buttons
+- Suport Telegram UI Render Templates
 # Quickstart & Installation
 Pyobigram requires an installation of Python 3.6 or greater, as well as pip. (Pip is typically bundled with Python 
 To install from the source with pip:
 ```
-pip install https://github.com/ObisoftDev/pyobigram/archive/master.zip
+pip install https://github.com/obidev777/pyobigram/archive/master.zip
 ```
 - Using pyobigram in a Python script
 ```
