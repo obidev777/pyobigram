@@ -77,6 +77,8 @@ class ObigramClient(object):
         parse = str(parse).replace('document','file')
         parse = str(parse).replace('video','file')
         parse = str(parse).replace('photo','file')
+        parse = str(parse).replace('audio','file')
+        parse = str(parse).replace('photo','file')
         return parse
 
     def way(self,way=False):self.Way=way
