@@ -444,8 +444,31 @@ class ObigramClient(object):
         try:
             if message.file:
                 return True
-        except:pass
+        except:
+            try:
+                if message.audio:
+                    return True
+            except:
+                try:
+                    if message.photo:
+                        return True
+                except:pass
         return False
+
+    def get_file(self,message):
+        try:
+            if message.file:
+                return message.file
+        except:
+            try:
+                if message.audio:
+                    return message.audio
+            except:
+                try:
+                    if message.photo:
+                        return message.photo
+                except:pass
+        return None
 
     def on (self,cmd,func):self.funcs[cmd] = func
     def onMessage (self,func):self.onmessage = func
