@@ -58,14 +58,11 @@ class FileProgressReader(BufferedReader):
         try:
             self.chunk_por += len(chunk)
             self.size_per_second+=len(chunk)
-            tcurrent = time.time() - self.time_start
-            self.time_total += tcurrent
-            self.time_start = time.time()
-            if self.time_total>=1:
+            if time.time() - self.time_start>=1:
                self.clock_time = (self.file_size - self.chunk_por) / (self.size_per_second)
                if self.progress_func:
                   self.progress_func(self.self_in,self.file_name,self.chunk_por,self.file_size,self.size_per_second,self.clock_time,self.progress_args)
-               self.time_total = 0
+               self.time_start = time.time()
                self.size_per_second = 0
         except:pass
         return chunk
