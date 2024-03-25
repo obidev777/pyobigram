@@ -8,12 +8,14 @@ def inlineKeyboardMarkup(**params):
 def inlineKeyboardMarkupArray(paramms):
     return {'inline_keyboard':paramms}
 
-def inlineKeyboardButton(text='text',url='',callback_data=''):
+def inlineKeyboardButton(text='text',url='',callback_data='',webapp_url=None):
     result = {'text':text}
     if url!='':
        result['url'] = url
     if callback_data!='':
        result['callback_data'] = callback_data
+    if webapp_url:
+        result['web_app'] = {'url':webapp_url}
     return result
 
 #Inline Queries
