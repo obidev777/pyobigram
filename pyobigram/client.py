@@ -77,8 +77,6 @@ class ObigramClient(object):
         parse = str(parse).replace('document','file')
         parse = str(parse).replace('video','file')
         parse = str(parse).replace('photo','file')
-        parse = str(parse).replace('audio','file')
-        parse = str(parse).replace('photo','file')
         return parse
 
     def way(self,way=False):self.Way=way
@@ -237,6 +235,18 @@ class ObigramClient(object):
         result = self.parseUpdate(result)
         parse = json.loads(result, object_hook = lambda d : Namespace(**d))
         return parse.result
+
+    def forward_message(self,sender_id,message):
+        forwardUrl = self.path + 'forwardMessage?'
+        jsonData = {
+            'chat_id':sender_id,
+            'from_chat_id':message.chat.id,
+            'message_id':message.message_id
+            }
+        result = requests.post(forwardUrl,json=jsonData).text
+        result = self.parseUpdate(result)
+        parse = json.loads(result, object_hook = lambda d : Namespace(**d)).result
+        return parse
 
     def get_file(self,file_id):
         getFileUrl = self.path + 'getFile?file_id=' + str(file_id)
@@ -413,7 +423,7 @@ class ObigramClient(object):
             pass
         return output
 
-    def forward_message(self,sender_id,message):
+    def mtp_forward_message(self,sender_id,message):
         async def asyncexec_forward():
             forward = await self.mtproto.forward_messages(sender_id,message.message_id,from_peer=message.sender.id)
             self.store[sender_id] = forward
@@ -446,31 +456,8 @@ class ObigramClient(object):
         try:
             if message.file:
                 return True
-        except:
-            try:
-                if message.audio:
-                    return True
-            except:
-                try:
-                    if message.photo:
-                        return True
-                except:pass
+        except:pass
         return False
-
-    def get_file(self,message):
-        try:
-            if message.file:
-                return message.file
-        except:
-            try:
-                if message.audio:
-                    return message.audio
-            except:
-                try:
-                    if message.photo:
-                        return message.photo
-                except:pass
-        return None
 
     def on (self,cmd,func):self.funcs[cmd] = func
     def onMessage (self,func):self.onmessage = func
