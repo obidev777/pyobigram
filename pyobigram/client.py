@@ -18,10 +18,18 @@ from typing import Dict, cast
 from telethon.tl.custom import Message
 from telethon.tl.types import TypeInputPeer, InputPeerChannel, InputPeerChat, InputPeerUser
 
-from telethon import TelegramClient
 from telethon.tl.types import InputDocument
 from telethon import functions, types
 from .paralleltransfer import download_file,create_stream
+from dataclasses import dataclass
+from typing import Optional, Union, cast
+import argparse
+import sys
+from random import randrange
+import configparser
+from telethon import TelegramClient
+from telethon.functions import channels
+from telethon.types import InputChannel
 
 import asyncio
 
@@ -354,6 +362,47 @@ class ObigramClient(object):
                 self.message_id = msg_id
                 pass
         return Message(chat_id,msg_id)
+
+    async def mtp_get_message(self,
+                  channel_id: Union[int, str],
+                  message_id: int,
+                  ):
+        client = self.mtproto
+        entity = await client.get_entity(channel_id)
+        input_channel = InputChannel(entity.id, entity.access_hash)
+        messages_request = channels.GetMessagesRequest(input_channel, [message_id])
+        channel_messages: messages.ChannelMessages = await client(messages_request)
+        messages = channel_messages.messages
+        return messages[0]
+
+    def mtp_get_message_link(self,link):
+        try:
+            # Check if the channel_id is valid
+            upload_id = createID()
+            channel_id = None
+            message_id = None
+            if link:
+                channel_id, message_id = link.split('/')[-2:]
+            updated_channel_id: Union[int, str] = channel_id
+            try:
+                updated_channel_id = int(channel_id)
+                if updated_channel_id > 0:
+                    updated_channel_id = int(f'-100{updated_channel_id}')
+            except ValueError as err:
+                updated_channel_id = f'@{updated_channel_id}'
+            async def asyncexec_forward():
+                msg = await self.mtp_get_message(updated_channel_id,int(message_id))
+                pass
+            self.loop.run_until_complete(asyncexec_forward())
+            output = None
+            while not output:
+                try:
+                    output = self.store[upload_id]
+                except:pass
+                pass
+            return output
+        except:pass
+        return None
 
     async def async_get_info_stream(self,message):
         peer = InputPeerUser(user_id=message.chat.id, access_hash=0)
