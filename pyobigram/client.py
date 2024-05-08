@@ -496,21 +496,6 @@ class ObigramClient(object):
             pass
         return output
 
-    def mtp_forward_message(self,sender_id,message):
-        async def asyncexec_forward():
-            forward = await self.mtproto.forward_messages(sender_id,message.message_id,from_peer=message.sender.id)
-            self.store[sender_id] = forward
-            pass
-        self.loop.run_until_complete(asyncexec_forward())
-        forward = None
-        while not forward:
-            try:
-                forward = self.store[sender_id]
-                self.store.pop(sender_id)
-            except:pass
-            pass
-        return forward
-
     def answer_inline(self,inline_query_id=0,result=[]):
         answerUrl = self.path + 'answerInlineQuery'
         payload = { 'inline_query_id' : inline_query_id,'results':result}
