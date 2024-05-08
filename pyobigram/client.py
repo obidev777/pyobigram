@@ -30,6 +30,7 @@ import configparser
 from telethon import TelegramClient
 from telethon.functions import channels
 from telethon.types import InputChannel
+from telethon.tl.functions.messages import ForwardMessagesRequest
 
 import asyncio
 
@@ -374,6 +375,28 @@ class ObigramClient(object):
         channel_messages: messages.ChannelMessages = await client(messages_request)
         messages = channel_messages.messages
         return messages[0]
+
+    def mtp_forward_message(self,msg,to_user):
+        try:
+            upload_id = createID()
+            async def asyncexec_forwad():
+                client = self.mtproto
+                frw = await client(ForwardMessagesRequest(
+                from_peer=msg.to_id,
+                id=[msg.id],
+                to_peer=to_user))
+                self.store[upload_id] = frw
+                pass
+            self.loop.run_until_complete(asyncexec_forwad())
+            output = None
+            while not output:
+                try:
+                    output = self.store[upload_id]
+                except:pass
+                pass
+            return output
+        except:pass
+        return None
 
     def mtp_get_message_link(self,link):
         try:
