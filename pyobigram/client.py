@@ -415,6 +415,7 @@ class ObigramClient(object):
                 updated_channel_id = f'@{updated_channel_id}'
             async def asyncexec_forward():
                 msg = await self.mtp_get_message(updated_channel_id,int(message_id))
+                self.store[upload_id] = msg
                 pass
             self.loop.run_until_complete(asyncexec_forward())
             output = None
