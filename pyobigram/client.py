@@ -368,13 +368,8 @@ class ObigramClient(object):
                   channel_id: Union[int, str],
                   message_id: int,
                   ):
-        client = self.mtproto
-        entity = await client.get_entity(channel_id)
-        input_channel = InputChannel(entity.id, entity.access_hash)
-        messages_request = channels.GetMessagesRequest(input_channel, [message_id])
-        channel_messages: messages.ChannelMessages = await client(messages_request)
-        messages = channel_messages.messages
-        return messages[0]
+        msg = await self.mtproto.get_messages(channel_id,ids=message_id)
+        return msg
 
     def mtp_forward_message(self,msg,to_user):
         try:
@@ -399,6 +394,7 @@ class ObigramClient(object):
         return None
 
     def mtp_get_message_link(self,link):
+        max_wait = 5;
         try:
             # Check if the channel_id is valid
             upload_id = createID()
@@ -419,10 +415,15 @@ class ObigramClient(object):
                 pass
             self.loop.run_until_complete(asyncexec_forward())
             output = None
+            wait=0
             while not output:
+                if wait>=max_wait:
+                    break
                 try:
                     output = self.store[upload_id]
-                except:pass
+                except:
+                    wait+=1
+                    time.sleep(1)
                 pass
             return output
         except:pass
