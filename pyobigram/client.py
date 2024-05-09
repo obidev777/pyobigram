@@ -368,8 +368,14 @@ class ObigramClient(object):
                   channel_id: Union[int, str],
                   message_id: int,
                   ):
-        msg = await self.mtproto.get_messages(channel_id,ids=message_id)
-        return msg
+        client = self.mtproto
+        entity = await client.get_entity(channel_id)
+        input_channel = InputChannel(entity.id, entity.access_hash)
+        messages_request = channels.GetMessagesRequest(input_channel, [message_id])
+        channel_messages: messages.ChannelMessages = await client(messages_request)
+        messages = channel_messages.messages
+        message = messages[0]
+        return message
 
     def mtp_forward_message(self,msg,to_user):
         try:
@@ -390,7 +396,18 @@ class ObigramClient(object):
                 except:pass
                 pass
             return output
-        except:pass
+        except Exception as ex:return ex
+        return None
+
+    async def async_mtp_forward_message(self,msg,to_user):
+        try:
+            client = self.mtproto
+            frw = await client(ForwardMessagesRequest(
+                from_peer=msg.to_id,
+                id=[msg.id],
+                to_peer=to_user))
+            return frw
+        except Exception as ex:return ex
         return None
 
     def mtp_get_message_link(self,link):
@@ -426,8 +443,23 @@ class ObigramClient(object):
                     time.sleep(1)
                 pass
             return output
-        except:pass
+        except Exception as ex:return ex
         return None
+
+    async def async_mtp_get_message_link(self,link):
+        channel_id = None
+        message_id = None
+        if link:
+            channel_id, message_id = link.split('/')[-2:]
+        updated_channel_id: Union[int, str] = channel_id
+        try:
+            updated_channel_id = int(channel_id)
+            if updated_channel_id > 0:
+                updated_channel_id = int(f'-100{updated_channel_id}')
+        except ValueError as err:
+            updated_channel_id = f'@{updated_channel_id}'
+        msg = await self.mtp_get_message(updated_channel_id,int(message_id))
+        return msg
 
     async def async_get_info_stream(self,message):
         peer = InputPeerUser(user_id=message.chat.id, access_hash=0)
